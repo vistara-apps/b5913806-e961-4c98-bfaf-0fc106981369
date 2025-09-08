@@ -10,7 +10,11 @@ export const metadata: Metadata = {
   description: 'A Base MiniApp that helps users track their emotions and build resilience through guided journaling and coping mechanisms.',
   keywords: ['emotional wellness', 'resilience', 'mood tracking', 'mental health', 'Base', 'MiniApp'],
   authors: [{ name: 'EmotiBuild Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: '#6366f1',
 };
 
