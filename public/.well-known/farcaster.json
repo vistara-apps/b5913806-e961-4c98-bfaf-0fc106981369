@@ -10,14 +10,14 @@
     "subtitle": "Built with Zara",
     "description": "EmotiBuild is a Base Mini App built with Zara.",
     "iconUrl": "https://0co.to/images/zara-2.png",
-    "homeUrl": "https://b5913806-e961-4c98-bfaf-0fc106981369.vercel.app",
-    "splashImageUrl": "https://dummyimage.com/200x200/0a0b0d/ffffff.png&text=Splash",
+    "homeUrl": "https://b5913806e9614c98bfaf0fc106981369-3fsv.vercel.app",
+    "splashImageUrl": "https://b5913806e9614c98bfaf0fc106981369-3fsv.vercel.app/splash.png",
     "splashBackgroundColor": "#000000",
-    "heroImageUrl": "https://dummyimage.com/1200x628/0a0b0d/ffffff.png&text=Hero",
+    "heroImageUrl": "https://b5913806e9614c98bfaf0fc106981369-3fsv.vercel.app/image.png",
     "tagline": "EmotiBuild",
     "screenshotUrls": [
-      "https://dummyimage.com/1200x628/0a0b0d/ffffff.png&text=Shot1",
-      "https://dummyimage.com/1200x628/0a0b0d/ffffff.png&text=Shot2"
+      "https://b5913806e9614c98bfaf0fc106981369-3fsv.vercel.app/screenshot.png",
+      "https://b5913806e9614c98bfaf0fc106981369-3fsv.vercel.app/screenshot.png"
     ],
     "primaryCategory": "social",
     "tags": [
@@ -25,6 +25,6 @@
       "miniapp",
       "onchainkit"
     ],
-    "webhookUrl": "https://b5913806-e961-4c98-bfaf-0fc106981369.vercel.app/api/webhook"
+    "webhookUrl": "https://b5913806e9614c98bfaf0fc106981369-3fsv.vercel.app/api/webhook"
   }
 }
