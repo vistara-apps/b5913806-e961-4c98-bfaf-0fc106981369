@@ -25,16 +25,18 @@ export function CopingCard({
     breathing: 'bg-blue-500',
     mindfulness: 'bg-green-500',
     affirmation: 'bg-purple-500',
-    exercise: 'bg-orange-500',
-    creative: 'bg-pink-500',
+    movement: 'bg-orange-500',
+    journaling: 'bg-pink-500',
+    visualization: 'bg-indigo-500',
   };
 
   const typeIcons = {
     breathing: '🫁',
     mindfulness: '🧘',
     affirmation: '💪',
-    exercise: '🏃',
-    creative: '🎨',
+    movement: '🏃',
+    journaling: '📝',
+    visualization: '🎯',
   };
 
   if (variant === 'summary') {
