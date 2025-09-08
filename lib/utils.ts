@@ -1,96 +1,115 @@
 import { MoodEntry, ResilienceMetrics, MoodType } from './types';
-import { format, isToday, subDays, differenceInDays } from 'date-fns';
 
-export function calculateResilienceMetrics(entries: MoodEntry[]): ResilienceMetrics {
-  if (entries.length === 0) {
+export function cn(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
+}
+
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
+
+export function formatTime(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(date);
+}
+
+export function calculateResilienceScore(moodEntries: MoodEntry[]): ResilienceMetrics {
+  if (moodEntries.length === 0) {
     return {
-      totalEntries: 0,
-      averageMood: 0,
+      overallScore: 0,
+      moodStability: 0,
+      copingUsage: 0,
       streakDays: 0,
-      copingMechanismsUsed: 0,
-      resilienceScore: 0,
+      improvementTrend: 'stable',
     };
   }
 
-  // Calculate average mood (convert mood to numeric scale)
-  const moodValues = entries.map(entry => getMoodValue(entry.mood));
-  const averageMood = moodValues.reduce((sum, value) => sum + value, 0) / moodValues.length;
+  // Calculate mood stability (lower variance = higher stability)
+  const intensities = moodEntries.map(entry => entry.intensity);
+  const avgIntensity = intensities.reduce((sum, val) => sum + val, 0) / intensities.length;
+  const variance = intensities.reduce((sum, val) => sum + Math.pow(val - avgIntensity, 2), 0) / intensities.length;
+  const moodStability = Math.max(0, 100 - (variance * 10));
+
+  // Calculate coping mechanism usage
+  const entriesWithCoping = moodEntries.filter(entry => entry.copingMechanismsUsed.length > 0);
+  const copingUsage = (entriesWithCoping.length / moodEntries.length) * 100;
 
   // Calculate streak days
-  const sortedEntries = entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  const sortedEntries = [...moodEntries].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   let streakDays = 0;
   let currentDate = new Date();
   
   for (const entry of sortedEntries) {
-    const daysDiff = differenceInDays(currentDate, entry.timestamp);
+    const entryDate = new Date(entry.timestamp);
+    const daysDiff = Math.floor((currentDate.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
+    
     if (daysDiff === streakDays) {
       streakDays++;
-      currentDate = subDays(currentDate, 1);
+      currentDate = entryDate;
     } else {
       break;
     }
   }
 
-  // Count unique coping mechanisms used
-  const copingMechanismsUsed = new Set(
-    entries.flatMap(entry => entry.copingMechanismsUsed || [])
-  ).size;
+  // Calculate improvement trend
+  const recentEntries = moodEntries.slice(-7); // Last 7 entries
+  const olderEntries = moodEntries.slice(-14, -7); // Previous 7 entries
+  
+  let improvementTrend: 'up' | 'down' | 'stable' = 'stable';
+  
+  if (recentEntries.length > 0 && olderEntries.length > 0) {
+    const recentAvg = recentEntries.reduce((sum, entry) => sum + entry.intensity, 0) / recentEntries.length;
+    const olderAvg = olderEntries.reduce((sum, entry) => sum + entry.intensity, 0) / olderEntries.length;
+    
+    if (recentAvg > olderAvg + 0.5) improvementTrend = 'up';
+    else if (recentAvg < olderAvg - 0.5) improvementTrend = 'down';
+  }
 
-  // Calculate resilience score (0-100)
-  const consistencyScore = Math.min(streakDays * 5, 30); // Max 30 points for consistency
-  const moodScore = (averageMood / 5) * 40; // Max 40 points for mood
-  const copingScore = Math.min(copingMechanismsUsed * 3, 30); // Max 30 points for coping variety
-
-  const resilienceScore = Math.round(consistencyScore + moodScore + copingScore);
+  // Calculate overall score
+  const overallScore = Math.round((moodStability + copingUsage + Math.min(streakDays * 5, 50)) / 2);
 
   return {
-    totalEntries: entries.length,
-    averageMood: Math.round(averageMood * 10) / 10,
+    overallScore,
+    moodStability: Math.round(moodStability),
+    copingUsage: Math.round(copingUsage),
     streakDays,
-    copingMechanismsUsed,
-    resilienceScore: Math.min(resilienceScore, 100),
+    improvementTrend,
   };
 }
 
-function getMoodValue(mood: MoodType): number {
-  const moodScale = {
-    'very-sad': 1,
-    'sad': 2,
-    'anxious': 2.5,
-    'angry': 2.5,
-    'neutral': 3,
-    'happy': 4,
-    'excited': 4.5,
-    'very-happy': 5,
-  };
-  return moodScale[mood] || 3;
-}
-
-export function formatDate(date: Date): string {
-  if (isToday(date)) {
-    return 'Today';
-  }
-  return format(date, 'MMM d');
-}
-
-export function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-export function getMoodTrend(entries: MoodEntry[]): 'improving' | 'declining' | 'stable' {
-  if (entries.length < 2) return 'stable';
+export function getMoodTrend(moodEntries: MoodEntry[]): 'improving' | 'declining' | 'stable' {
+  if (moodEntries.length < 2) return 'stable';
   
-  const recent = entries.slice(-7); // Last 7 entries
-  const older = entries.slice(-14, -7); // Previous 7 entries
+  const recent = moodEntries.slice(-3);
+  const older = moodEntries.slice(-6, -3);
   
   if (recent.length === 0 || older.length === 0) return 'stable';
   
-  const recentAvg = recent.reduce((sum, entry) => sum + getMoodValue(entry.mood), 0) / recent.length;
-  const olderAvg = older.reduce((sum, entry) => sum + getMoodValue(entry.mood), 0) / older.length;
+  const recentAvg = recent.reduce((sum, entry) => sum + entry.intensity, 0) / recent.length;
+  const olderAvg = older.reduce((sum, entry) => sum + entry.intensity, 0) / older.length;
   
-  const difference = recentAvg - olderAvg;
+  const diff = recentAvg - olderAvg;
   
-  if (difference > 0.3) return 'improving';
-  if (difference < -0.3) return 'declining';
+  if (diff > 0.5) return 'improving';
+  if (diff < -0.5) return 'declining';
   return 'stable';
+}
+
+export function getRandomCopingMechanism() {
+  const mechanisms = [
+    "Take 5 deep breaths, focusing on the exhale",
+    "Name 3 things you can see, 2 you can hear, 1 you can touch",
+    "Repeat: 'This feeling is temporary and will pass'",
+    "Do 10 jumping jacks or stretch your arms",
+    "Write down one thing you're grateful for today",
+  ];
+  
+  return mechanisms[Math.floor(Math.random() * mechanisms.length)];
 }

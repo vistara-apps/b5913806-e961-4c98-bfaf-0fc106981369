@@ -15,10 +15,6 @@
     @apply h-full bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 text-white font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
-  #__next {
-    @apply h-full;
-  }
 }
 
 @layer components {
@@ -38,12 +34,8 @@
     @apply text-4xl cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95;
   }
   
-  .mood-emoji.selected {
-    @apply scale-125 drop-shadow-lg;
-  }
-  
   .coping-card {
-    @apply glass-card p-4 hover:bg-opacity-15 transition-all duration-200 cursor-pointer;
+    @apply glass-card p-4 hover:bg-opacity-15 transition-all duration-200;
   }
   
   .metric-card {

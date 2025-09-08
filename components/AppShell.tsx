@@ -1,73 +1,97 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Home, BookOpen, BarChart3, Settings2 } from 'lucide-react';
+import { User } from '@/lib/types';
+import { LocalStorage } from '@/lib/storage';
+import { MoodJournal } from './MoodJournal';
+import { CopingLibrary } from './CopingLibrary';
+import { ResilienceDashboard } from './ResilienceDashboard';
+import { Navigation } from './Navigation';
+import { WelcomeScreen } from './WelcomeScreen';
 
-interface AppShellProps {
-  children: React.ReactNode;
-  currentTab: string;
-  onTabChange: (tab: string) => void;
-}
+type ActiveTab = 'journal' | 'coping' | 'dashboard';
 
-export function AppShell({ children, currentTab, onTabChange }: AppShellProps) {
-  const [mounted, setMounted] = useState(false);
+export function AppShell() {
+  const [user, setUser] = useState<User | null>(null);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('journal');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
+    // Initialize user data
+    const existingUser = LocalStorage.getUser();
+    if (existingUser) {
+      setUser(existingUser);
+    } else {
+      // Create new user
+      const newUser: User = {
+        id: `user_${Date.now()}`,
+        moodEntries: [],
+        favoriteCopingMechanisms: [],
+        createdAt: new Date(),
+      };
+      LocalStorage.setUser(newUser);
+      setUser(newUser);
+    }
+    setIsLoading(false);
   }, []);
 
-  if (!mounted) {
+  const handleUserUpdate = (updatedUser: User) => {
+    setUser(updatedUser);
+    LocalStorage.setUser(updatedUser);
+  };
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
       </div>
     );
   }
 
-  const tabs = [
-    { id: 'journal', label: 'Journal', icon: Home },
-    { id: 'coping', label: 'Coping', icon: BookOpen },
-    { id: 'insights', label: 'Insights', icon: BarChart3 },
-    { id: 'settings', label: 'Settings', icon: Settings2 },
-  ];
+  if (!user) {
+    return <WelcomeScreen onUserCreated={handleUserUpdate} />;
+  }
+
+  const isFirstTime = user.moodEntries.length === 0;
 
   return (
-    <div className="min-h-screen flex flex-col max-w-md mx-auto bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700">
-      {/* Header */}
-      <header className="p-4 text-center">
-        <h1 className="text-2xl font-bold text-gradient">EmotiBuild</h1>
-        <p className="text-sm text-text-secondary mt-1">Build resilience, one emotion at a time</p>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700">
+      <div className="max-w-md mx-auto min-h-screen bg-black bg-opacity-20 backdrop-blur-sm">
+        {/* Header */}
+        <header className="p-4 text-center border-b border-white border-opacity-20">
+          <h1 className="text-2xl font-bold text-gradient">EmotiBuild</h1>
+          <p className="text-sm text-text-secondary mt-1">
+            Build resilience, one emotion at a time
+          </p>
+        </header>
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 pb-20">
-        {children}
-      </main>
+        {/* Main Content */}
+        <main className="flex-1 p-4">
+          {isFirstTime && activeTab === 'journal' && (
+            <div className="glass-card p-4 mb-4 animate-fade-in">
+              <h3 className="font-semibold mb-2">Welcome to EmotiBuild! 👋</h3>
+              <p className="text-sm text-text-secondary">
+                Start by logging your current mood. This helps you build awareness of your emotional patterns.
+              </p>
+            </div>
+          )}
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-black bg-opacity-20 backdrop-blur-md border-t border-white border-opacity-20">
-        <div className="flex justify-around py-2">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = currentTab === tab.id;
-            
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onTabChange(tab.id)}
-                className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                  isActive 
-                    ? 'text-white bg-white bg-opacity-20' 
-                    : 'text-text-secondary hover:text-white'
-                }`}
-              >
-                <Icon size={20} />
-                <span className="text-xs mt-1">{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
+          {activeTab === 'journal' && (
+            <MoodJournal user={user} onUserUpdate={handleUserUpdate} />
+          )}
+          
+          {activeTab === 'coping' && (
+            <CopingLibrary user={user} onUserUpdate={handleUserUpdate} />
+          )}
+          
+          {activeTab === 'dashboard' && (
+            <ResilienceDashboard user={user} />
+          )}
+        </main>
+
+        {/* Navigation */}
+        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
     </div>
   );
 }
