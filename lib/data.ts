@@ -1,26 +1,20 @@
-import { CopingMechanism } from './types';
+import { CopingMechanism, MoodType } from './types';
 
-export const MOOD_EMOJIS = {
-  'very-happy': '😄',
-  'happy': '😊',
-  'neutral': '😐',
-  'sad': '😢',
-  'very-sad': '😭',
-  'anxious': '😰',
-  'angry': '😠',
-  'excited': '🤩',
-} as const;
+// Use the MOOD_EMOJIS from types.ts
+export { MOOD_EMOJIS } from './types';
 
-export const MOOD_LABELS = {
-  'very-happy': 'Very Happy',
-  'happy': 'Happy',
-  'neutral': 'Neutral',
-  'sad': 'Sad',
-  'very-sad': 'Very Sad',
-  'anxious': 'Anxious',
-  'angry': 'Angry',
-  'excited': 'Excited',
-} as const;
+export const MOOD_LABELS: Record<MoodType, string> = {
+  happy: 'Happy',
+  sad: 'Sad',
+  anxious: 'Anxious',
+  angry: 'Angry',
+  excited: 'Excited',
+  calm: 'Calm',
+  frustrated: 'Frustrated',
+  grateful: 'Grateful',
+  overwhelmed: 'Overwhelmed',
+  content: 'Content',
+};
 
 export const COPING_MECHANISMS: CopingMechanism[] = [
   {
@@ -30,6 +24,9 @@ export const COPING_MECHANISMS: CopingMechanism[] = [
     type: 'breathing',
     content: 'Inhale for 4 counts, hold for 7 counts, exhale for 8 counts. Repeat 3-4 times.',
     duration: 2,
+    difficulty: 'easy',
+    tags: ['anxiety', 'stress', 'quick'],
+    isPremium: false,
   },
   {
     id: '2',
@@ -38,6 +35,9 @@ export const COPING_MECHANISMS: CopingMechanism[] = [
     type: 'mindfulness',
     content: 'Take a moment to think of three specific things you\'re grateful for today. Write them down or say them aloud.',
     duration: 3,
+    difficulty: 'easy',
+    tags: ['gratitude', 'mindfulness', 'positivity'],
+    isPremium: false,
   },
   {
     id: '3',
@@ -46,22 +46,31 @@ export const COPING_MECHANISMS: CopingMechanism[] = [
     type: 'affirmation',
     content: 'Repeat: "I am capable, I am strong, I can handle whatever comes my way." Say it with conviction.',
     duration: 1,
+    difficulty: 'easy',
+    tags: ['confidence', 'self-esteem', 'quick'],
+    isPremium: false,
   },
   {
     id: '4',
     name: '5-Minute Walk',
     description: 'Get moving to boost your mood naturally',
-    type: 'exercise',
+    type: 'movement',
     content: 'Take a 5-minute walk, preferably outside. Focus on your surroundings and breathe deeply.',
     duration: 5,
+    difficulty: 'easy',
+    tags: ['exercise', 'nature', 'mood-boost'],
+    isPremium: false,
   },
   {
     id: '5',
-    name: 'Creative Doodling',
-    description: 'Express yourself through simple drawing',
-    type: 'creative',
-    content: 'Grab a pen and paper. Doodle whatever comes to mind for 5 minutes. Don\'t worry about making it perfect.',
+    name: 'Creative Visualization',
+    description: 'Express yourself through guided imagery',
+    type: 'visualization',
+    content: 'Close your eyes and imagine a peaceful place. Visualize all the details - colors, sounds, smells. Stay there for 5 minutes.',
     duration: 5,
+    difficulty: 'medium',
+    tags: ['creativity', 'relaxation', 'imagination'],
+    isPremium: false,
   },
   {
     id: '6',
@@ -70,7 +79,20 @@ export const COPING_MECHANISMS: CopingMechanism[] = [
     type: 'mindfulness',
     content: 'Lie down and mentally scan your body from head to toe. Notice any tension and consciously relax those areas.',
     duration: 10,
+    difficulty: 'medium',
+    tags: ['meditation', 'relaxation', 'body-awareness'],
     isPremium: true,
+  },
+  {
+    id: '7',
+    name: 'Emotional Journaling',
+    description: 'Process your feelings through writing',
+    type: 'journaling',
+    content: 'Write about your current emotions without judgment. Describe what you\'re feeling and why you think you feel this way.',
+    duration: 8,
+    difficulty: 'medium',
+    tags: ['self-reflection', 'processing', 'writing'],
+    isPremium: false,
   },
 ];
 

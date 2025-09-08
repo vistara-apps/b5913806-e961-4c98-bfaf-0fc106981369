@@ -57,7 +57,7 @@ export function MoodJournal({ user, onUserUpdate }: MoodJournalProps) {
     // Update user's mood entries
     const updatedUser = {
       ...user,
-      moodEntries: [...user.moodEntries, newEntry.id],
+      moodEntries: [...user.moodEntries, newEntry],
     };
     onUserUpdate(updatedUser);
 
