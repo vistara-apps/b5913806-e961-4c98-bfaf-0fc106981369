@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  html {
+    @apply h-full;
+  }
+  
+  body {
+    @apply h-full bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 text-white font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  #__next {
+    @apply h-full;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20 rounded-lg shadow-card;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply glass-card text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-20 transition-all duration-200;
+  }
+  
+  .mood-emoji {
+    @apply text-4xl cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95;
+  }
+  
+  .mood-emoji.selected {
+    @apply scale-125 drop-shadow-lg;
+  }
+  
+  .coping-card {
+    @apply glass-card p-4 hover:bg-opacity-15 transition-all duration-200 cursor-pointer;
+  }
+  
+  .metric-card {
+    @apply glass-card p-4 text-center;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent;
+  }
+}
