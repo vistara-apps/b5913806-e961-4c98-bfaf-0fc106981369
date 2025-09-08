@@ -1,7 +1,9 @@
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 import { MoodEntry, ResilienceMetrics, MoodType } from './types';
 
-export function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
 
 export function formatDate(date: Date): string {
@@ -112,4 +114,92 @@ export function getRandomCopingMechanism() {
   ];
   
   return mechanisms[Math.floor(Math.random() * mechanisms.length)];
+}
+
+export function formatRelativeTime(date: Date): string {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) {
+    return 'Just now';
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else if (diffInSeconds < 604800) {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  } else {
+    return formatDate(date);
+  }
+}
+
+export function getMoodColor(mood: MoodType): string {
+  const colors = {
+    happy: 'from-yellow-400 to-orange-400',
+    sad: 'from-blue-400 to-blue-600',
+    anxious: 'from-red-400 to-pink-400',
+    angry: 'from-red-500 to-red-700',
+    excited: 'from-purple-400 to-pink-400',
+    calm: 'from-green-400 to-blue-400',
+    frustrated: 'from-orange-400 to-red-400',
+    grateful: 'from-purple-400 to-indigo-400',
+    overwhelmed: 'from-gray-400 to-gray-600',
+    content: 'from-green-300 to-green-500',
+  };
+  
+  return colors[mood] || 'from-gray-400 to-gray-600';
+}
+
+export function generateId(): string {
+  return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
+export function isToday(date: Date): boolean {
+  const today = new Date();
+  return date.toDateString() === today.toDateString();
+}
+
+export function isYesterday(date: Date): boolean {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return date.toDateString() === yesterday.toDateString();
+}
+
+export function getMoodIntensityLabel(intensity: number): string {
+  if (intensity <= 2) return 'Very Low';
+  if (intensity <= 4) return 'Low';
+  if (intensity <= 6) return 'Moderate';
+  if (intensity <= 8) return 'High';
+  return 'Very High';
+}
+
+export function getStreakEmoji(days: number): string {
+  if (days === 0) return '🌱';
+  if (days < 7) return '🔥';
+  if (days < 30) return '⚡';
+  if (days < 100) return '🚀';
+  return '👑';
+}
+
+export function capitalizeFirst(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
 }
